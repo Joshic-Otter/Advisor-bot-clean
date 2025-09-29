@@ -7,19 +7,16 @@ function buildAirtableUrl(query) {
   const q = (query || "").replace(/"/g, '\\"');
   const formula = `OR(
     SEARCH(LOWER("${q}"), LOWER({Question}))>0,
-    SEARCH(LOWER("${q}"), LOWER({Bottom_Line}))>0,
-    SEARCH(LOWER("${q}"), LOWER({Bottom line}))>0,
+    SEARCH(LOWER("${q}"), LOWER({Bottom Line}))>0,
     SEARCH(LOWER("${q}"), LOWER({Why}))>0,
-    SEARCH(LOWER("${q}"), LOWER({Next_Steps}))>0,
-    SEARCH(LOWER("${q}"), LOWER({Next steps}))>0,
-    SEARCH(LOWER("${q}"), LOWER({Heads_Up}))>0,
-    SEARCH(LOWER("${q}"), LOWER({Heads up}))>0,
+    SEARCH(LOWER("${q}"), LOWER({Next Steps}))>0,
+    SEARCH(LOWER("${q}"), LOWER({Heads Up}))>0,
     SEARCH(LOWER("${q}"), LOWER(ARRAYJOIN({Tags}, ",")))>0,
     SEARCH(LOWER("${q}"), LOWER({tags}))>0
   )`;
   url.searchParams.set("filterByFormula", formula);
   url.searchParams.set("maxRecords", "1");
-  url.searchParams.set("sort[0][field]", "Last_Reviewed_On");
+  url.searchParams.set("sort[0][field]", "Last Reviewed On");
   url.searchParams.set("sort[0][direction]", "desc");
   return url.toString();
 }
@@ -38,8 +35,8 @@ export default async function handler(req, res) {
     const body = req.body || {};
     const message = body.message || "";
     const debug = !!body.debug;
-
     if (!message) return res.status(400).json({ error: "message required" });
+
     if (!AIRTABLE_BASE || !AIRTABLE_TOKEN || !AIRTABLE_TABLE) {
       return res.status(500).json({
         error: "missing_env",
@@ -62,15 +59,7 @@ export default async function handler(req, res) {
     const data = await r.json();
     if (!data.records?.length) {
       return res.json({
-        answer: {
-          bottom_line: "",
-          why: "",
-          next: "",
-          heads_up: "",
-          sources: [],
-          effective_term: "",
-          policy_id: ""
-        },
+        answer: { bottom_line: "", why: "", next: "", heads_up: "", sources: [], effective_term: "", policy_id: "" },
         meta: { last_reviewed_on: "", last_reviewed_by: "", tags: [] },
         debug: debug ? { matched: false } : undefined
       });
@@ -78,15 +67,15 @@ export default async function handler(req, res) {
 
     const f = data.records[0].fields;
 
-    const bottomLine = pickField(f, ["Bottom_Line", "Bottom line", "bottom_line", "BottomLine"]);
+    const bottomLine = pickField(f, ["Bottom Line", "Bottom_Line", "bottom_line", "BottomLine"]);
     const why = pickField(f, ["Why", "why"]);
-    const nextSteps = pickField(f, ["Next_Steps", "Next steps", "next_steps", "NextSteps"]);
-    const headsUp = pickField(f, ["Heads_Up", "Heads up", "heads_up", "HeadsUp"]);
+    const nextSteps = pickField(f, ["Next Steps", "Next_Steps", "next_steps", "NextSteps"]);
+    const headsUp = pickField(f, ["Heads Up", "Heads_Up", "heads_up", "HeadsUp"]);
     const sourcesRaw = pickField(f, ["Sources", "Source", "sources"]);
-    const effectiveTerm = pickField(f, ["Effective_Term", "Effective term", "effective_term"]);
-    const policyId = pickField(f, ["Policy_Id", "Policy ID", "policy_id"]);
-    const lastReviewedBy = pickField(f, ["Last_Reviewed_By", "Last reviewed by", "last_reviewed_by"]);
-    const lastReviewedOn = pickField(f, ["Last_Reviewed_On", "Last reviewed on", "last_reviewed_on"]);
+    const effectiveTerm = pickField(f, ["Effective Term", "Effective_Term", "effective_term"]);
+    const policyId = pickField(f, ["Policy ID", "Policy_Id", "policy_id"]);
+    const lastReviewedBy = pickField(f, ["Last Reviewed By", "Last_Reviewed_By", "last_reviewed_by"]);
+    const lastReviewedOn = pickField(f, ["Last Reviewed On", "Last_Reviewed_On", "last_reviewed_on"]);
     const tags = f.Tags || f.tags || [];
 
     const sources = Array.isArray(sourcesRaw)
